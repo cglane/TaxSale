@@ -7,7 +7,7 @@ from django.db import models
 # Create your models here.
 class CensusTract(models.Model):
   year = models.PositiveSmallIntegerField()
-  name = models.CharField(max_length=50)
+  number = models.IntegerField()
   percent_white = models.DecimalField(max_digits=4,decimal_places=2)
   percent_black = models.DecimalField(max_digits=4,decimal_places=2)
   percent_hispanic = models.DecimalField(max_digits=4,decimal_places=2)
@@ -17,7 +17,9 @@ class Property(models.Model):
   """A Property that is going up for auction including whether the property was
     Deeded or Not.
   """
+  year = models.IntegerField()
   address = models.CharField(max_length=50)
+  tract = models.IntegerField()
   zip_code = models.CharField(max_length=10)
   tax_debt = models.FloatField()
   property_value = models.IntegerField()

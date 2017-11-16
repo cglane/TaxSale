@@ -5,16 +5,16 @@ import unittest
 from helpers import CensusTract
 
 class TestCensusTract(unittest.TestCase):
-    def test_get_census_tract(self):
-        """Find Soup info from address string"""
-        address_str = '13 Drews Ct. Charleston SC'
-        soup = CensusTract(address_str)
-        lat_lng = soup.getLatLng()
-        self.assertEqual(lat_lng['lat'], '-79.94081')
+    # def test_get_census_tract(self):
+    #     """Find Soup info from address string"""
+    #     address_str = '13 Drews Ct. Charleston SC'
+    #     soup = CensusTract(address_str)
+    #     lat_lng = soup.getLatLng()
+    #     self.assertEqual(lat_lng['lat'], '-79.94081')
     def test_get_stats(self):
         address_str = '13 Drews Ct. Charleston SC'
         soup = CensusTract(address_str)
-        stats = soup.getStats()
-        self.assertEqual(stats, {})
+        survey = soup.surveySoup('29403', '2013')
+        self.assertEqual(survey, {})
 if __name__ == '__main__':
     unittest.main()
