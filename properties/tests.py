@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.conf import settings
+from helpers import LocationFinder
+from django.test import TestCase
 
-import unittest
-from helpers import CensusTract
 
-class TestCensusTract(unittest.TestCase):
-    # def test_get_census_tract(self):
-    #     """Find Soup info from address string"""
-    #     address_str = '13 Drews Ct. Charleston SC'
-    #     soup = CensusTract(address_str)
-    #     lat_lng = soup.getLatLng()
-    #     self.assertEqual(lat_lng['lat'], '-79.94081')
-    def test_get_stats(self):
+class UnitTest(TestCase):
+
+    def test_find_info(self):
+        """Animals that can speak are correctly identified"""
         address_str = '13 Drews Ct. Charleston SC'
-        soup = CensusTract(address_str)
-        survey = soup.surveySoup('29403', '2013')
-        self.assertEqual(survey, {})
-if __name__ == '__main__':
-    unittest.main()
+        location_obj = LocationFinder(address_str, '2015')
+        location_fields = location_obj.getCensusStats()
+        print location_fields
+        self.assertEqual(location_fields['Zip'], ' 29403')
+

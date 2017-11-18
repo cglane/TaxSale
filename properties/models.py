@@ -6,19 +6,32 @@ from django.db import models
 
 # Create your models here.
 class CensusTract(models.Model):
-  year = models.PositiveSmallIntegerField()
-  number = models.IntegerField()
-  percent_white = models.DecimalField(max_digits=4,decimal_places=2)
-  percent_black = models.DecimalField(max_digits=4,decimal_places=2)
-  percent_hispanic = models.DecimalField(max_digits=4,decimal_places=2)
-  occupied_housing = models.DecimalField(max_digits=4,decimal_places=2)
-
+  year = models.CharField(max_length=5)
+  tract_number = models.IntegerField()
+  black_total = models.IntegerField()
+  white_total = models.IntegerField()
+  population_total = models.IntegerField()
+  county = models.IntegerField()
+  state = models.IntegerField()
+  @classmethod
+  def create(self, response, census_map, data_year):
+      """Parse the response and then create a workable object for
+        saving the tract object
+      """
+      response_val = response.json()
+      res_dict = dict(zip(response_val[0], response_val[1]))
+      model_dict = {census_map[name]: val for name, val in res_dict.iteritems()}
+      model_dict['year'] = data_year
+      tract = self(**model_dict)
+      tract.save()
+      return tract
 class Property(models.Model):
   """A Property that is going up for auction including whether the property was
     Deeded or Not.
   """
   year = models.IntegerField()
   address = models.CharField(max_length=50)
+  property_pin = models.IntegerField()
   tract = models.IntegerField()
   zip_code = models.CharField(max_length=10)
   tax_debt = models.FloatField()
