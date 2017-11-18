@@ -6,7 +6,9 @@ import mechanize
 import urllib
 from selenium import webdriver
 from models import CensusTract
+from utils import formatAddress
 br = mechanize.Browser()
+
 ##Get around robot blocker
 br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
 br.set_handle_robots(False)
@@ -51,18 +53,25 @@ class CensusTractHelper(object):
       tract = CensusTract.create(response, self.census_field_map, data_year)
       return tract.id
     return 2
+
+
 class LocationFinder(CensusTractHelper):
   """Queries the census DB for metadata"""
-  geo_fields = ['Lat', 'Lng', 'TRACT', 'Zip', 'Address']
-  def __init__(self, addressStr, year):
+  geo_fields = ['Lat', 'Lng', 'TRACT', 'Zip']
+  def __init__(self, addressStr, year, state):
     """Get beautiful soup object of the address"""
     self.year = year
-    formatted_adddress = "+".join([x for x in addressStr.split()])
-    tab_url = ("https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress?address="
+    formatted_address = formatAddress(addressStr, state)
+
+    print (formatted_adddress, 'formatted address')
+    tab_url = ("https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress?a"
+            +"?address="
             +formatted_adddress
             +"&benchmark=4&vintage=4")
+    print ('tab_url', tab_url)
     request = requests.get(tab_url).content
     self.soup = BeautifulSoup(request, 'html.parser')
+    print self.soup
     self.createLocationDict()
     self.getLatLng()
 
@@ -82,7 +91,7 @@ class LocationFinder(CensusTractHelper):
       self.location_dict = {}
 
   def getLatLng(self):
-    if self.location_dict['Coordinates']:
+    if self.location_dict.get('Coordinates'):
       split_str = self.location_dict['Coordinates'].split()
       self.location_dict['Lat'] = split_str[1]
       self.location_dict['Lng'] = split_str[3]
@@ -98,4 +107,5 @@ class LocationFinder(CensusTractHelper):
       location_fields = { field: self.location_dict[field] for field in self.geo_fields }
       location_fields['census_tract'] = census_tract_record
       return location_fields
-    return self.location_fields
+    return { field: '' for field in self.geo_fields }
+
