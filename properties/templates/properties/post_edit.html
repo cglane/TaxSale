@@ -1,0 +1,17 @@
+{% extends 'properties/base.html' %}
+{% load staticfiles %}
+{% load material_form %}
+
+{% block content %}
+    <div class="mdl-cell mdl-cell--6-col">
+        <h1>New post</h1>
+        <form method="POST" class="post-form">{% csrf_token %}
+                    {% form form=form %}{% endform %}
+        <button type="submit" class="save btn btn-default">Save</button>
+        </form>
+    </div>
+    <div class="mdl-cell mdl-cell--6-col">
+        <img class="data-map" src="{% static img %}"/>
+    </div>
+
+{% endblock %}

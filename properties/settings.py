@@ -32,7 +32,10 @@ CENSUS_MAP = {
 YEAR_MAX = 2015
 ALLOWED_HOSTS = ['*']
 
+### Google
+GOOGLE_API_KEY = 'AIzaSyCW_RhZ1WBIUVbXT_kG_39d7-LPD-BG2x4'
 
+ROOT_URLCONF = 'properties.urls'
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,6 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'properties',
+    'material',
+    'material.frontend',
+    'material.admin',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +68,7 @@ TEMPLATES = [
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -73,6 +80,11 @@ TEMPLATES = [
 ]
 
 
+
+DIRNAME = os.path.abspath(os.path.dirname(__file__))
+TEMPLATE_DIRS = (
+    os.path.join(DIRNAME, 'templates/'),
+)
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases

@@ -1,0 +1,24 @@
+{% load staticfiles %}
+{% include 'material/includes/material_css.html' %}
+<script src="{% static 'material/js/jquery.js' %}"></script>
+{% include 'material/includes/material_js.html' %}
+<html>
+    <head>
+        <title>Data Visualization</title>
+         <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="{% static 'less/styles.less' %}">
+    </head>
+    <body>
+        <div class="page-header">
+            <h1 class="text-center">Data Visualization</h1>
+        </div>
+        <div class="content container">
+            <div class="row">
+                <div class="content-grid mdl-grid">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

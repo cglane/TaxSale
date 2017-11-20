@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from properties.models import CensusTract, Property
-from properties.helpers import (LocationFinder, GoogleLocationFinder)
+from properties.helpers import (LocationFinder, GoogleLocationFinder, GovernMaxFinder)
 import csv
 
 
@@ -17,23 +17,33 @@ def findCloseCensusTracts(google_finder, address, year):
         return close_property[0].census_tract
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        filepath = './data-all.csv'
+        filepath = './imports/2014.csv'
+        year = '2014'
         reader = csv.DictReader(open(filepath, 'rb'))
         google_finder = GoogleLocationFinder('SC')
+        governmax_finder = GovernMaxFinder()
         for test_line in reader:
-            address = test_line['Parcel Address']
             pin = test_line['Pin']
-            year = test_line['TaxYear']
-            property_records = Property.objects.filter(property_pin=pin, year=year)
+            ###To be safe not searching by year
+            print pin
+            property_records = Property.objects.filter(property_pin=pin)
             if not property_records:
-                location_obj = LocationFinder(address, year, 'SC')
-                location_dict = location_obj.getCensusStats()
-                try:
-                    Property.create(location_dict, test_line)
-                    print 'Success: %s'% address
-                except Exception as e:
-                    print 'Failure: %s'% address
-                    print e
+                governmax_data = governmax_finder.getMappedData(pin, year)
+                if not all(value == '' for value in governmax_data.values()):
+                    address = governmax_data['address']
+                    location_obj = LocationFinder(address, year, 'SC')
+                    location_dict = location_obj.getCensusStats()
+                    location_dict.update(governmax_data)
+                    location_dict['year'] = year
+                    try:
+                        Property.create(location_dict, test_line)
+                        print 'Success: %s' % address
+                    except Exception as e:
+                        print 'Failure: %s' % address
+                        print e
+                else:
+                    'Failed to find data for pin: %s' % pin
+
             elif not property_records[0].census_tract:
                 location_obj = LocationFinder(address, year, 'SC')
                 location_dict = location_obj.getCensusStats()
@@ -57,6 +67,7 @@ class Command(BaseCommand):
                     else:
                         print 'Exists but still no census tract: %s' % address
             else:
+                address = property_records[0].address
                 print "Already added for: %s" % address
 
         self.stdout.write(self.style.SUCCESS('Successfully finished loop'))
